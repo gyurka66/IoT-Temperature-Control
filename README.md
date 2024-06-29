@@ -7,7 +7,7 @@ The project can be installed in about an hour if using the code in this reposito
 # Material Requirements
 | 2x Raspberry Pi Pico WH          | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa |
 |----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 2x TMP36 temperature sensor      | ![alt text]([http://url/to/img.png](https://malnapc.cdn.shoprenter.hu/custom/malnapc/image/cache/w640h480wt1q100/images/Raspberry/55338.jpg.webp?lastmod=1719487244.1716746513)) |
+| 2x TMP36 temperature sensor      | ![alt text](https://malnapc.cdn.shoprenter.hu/custom/malnapc/image/cache/w640h480wt1q100/images/Raspberry/55338.jpg.webp?lastmod=1719487244.1716746513) |
 | 6x Cables                        |                                                                                                                                                                                  |
 | 2x Breadboards                   |                                                                                                                                                                                  |
 | 1x Computer (for running server) |                                                                                                                                                                                  |
