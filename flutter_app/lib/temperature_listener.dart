@@ -13,7 +13,7 @@ Future<void> temperatureListener(SendPort sendPort) async {
     var client = http.Client();
     try {
       while(true) { // We try to use the same client connection as long as possible
-        sleep(const Duration(seconds: 5)); //wait 5 secs between queries
+        sleep(const Duration(seconds: 60)); //wait 60 secs between queries
         var response = await client.get(iotGatewayUrl);
         // Response format -> "[inside temperature in decicelsius],[outside temperatuer in decicelsius]"
         sendPort.send(response.body);

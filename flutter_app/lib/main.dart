@@ -2,9 +2,31 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:flutter/material.dart';
+import 'notification_controller.py.dart';
 import 'temperature_listener.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() {
+  AwesomeNotifications().initialize(
+    // set the icon to null if you want to use the default app icon
+      null,
+      [
+        NotificationChannel(
+            channelGroupKey: 'basic_channel_group',
+            channelKey: 'basic_channel',
+            channelName: 'Basic notifications',
+            channelDescription: 'Notification channel for basic texts',
+            defaultColor: Color(0xFF9D50DD),
+            ledColor: Colors.white)
+      ],
+      // Channel groups are only visual and are not required
+      channelGroups: [
+        NotificationChannelGroup(
+            channelGroupKey: 'basic_channel_group',
+            channelGroupName: 'Basic group')
+      ],
+      debug: true
+  );
   runApp(const MyApp());
 }
 
@@ -15,27 +37,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Temperature Watcher',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Temperature Monitor'),
     );
   }
 }
@@ -62,6 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   double _insideTemperature = -1;
   double _outsideTemperature = -1;
+  bool insideMoreWarm = false;
+  String _recommendedAction = "Waiting for Data Connection...";
 
   void _incrementCounter() {
     setState(() {
@@ -76,9 +85,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+    );
+
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        // This is just a basic example. For real apps, you must show some
+        // friendly dialog box before call the request method.
+        // This is very important to not harm the user experience
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
     startTemperatureListener();
     print("testifasync");
+
   }
 
   void startTemperatureListener() async {
@@ -98,7 +123,26 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _insideTemperature = int.parse(splitted[0])/10; // Divide by ten to convert back to full Celsius
           _outsideTemperature = int.parse(splitted[1])/10;
+          if(_insideTemperature > _outsideTemperature) {
+            _recommendedAction = "Open the windows!";
+          }
+          else {
+            _recommendedAction = "Close the windows!";
+          }
         });
+        if(_insideTemperature < _outsideTemperature && insideMoreWarm || _insideTemperature > _outsideTemperature && !insideMoreWarm) { //Ie status changed
+          // Create the notifications!
+          AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                id: 10,
+                channelKey: 'basic_channel',
+                actionType: ActionType.Default,
+                title: 'Recommended Action:',
+                body: _recommendedAction,
+              )
+          );
+          insideMoreWarm = ! insideMoreWarm;
+        }
       }
     });
   }
@@ -152,6 +196,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               '$_outsideTemperature',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Text(
+              _recommendedAction,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
