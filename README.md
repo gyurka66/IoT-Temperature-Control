@@ -10,7 +10,11 @@ The project can be installed in about an hour if using the code in this reposito
 | 6x Cables                        | ![alt text](https://malnapc.cdn.shoprenter.hu/custom/malnapc/image/cache/w370h315q100/images/A758_Premium_jumper_150mm_papa_papa.jpg.webp?lastmod=1719106605.1716746513)       |
 | 2x Breadboards                   | ![alt text](https://malnapc.cdn.shoprenter.hu/custom/malnapc/image/cache/w640h480wt1q100/images/31971.jpg.webp?lastmod=1719395420.1716746513)                                  |
 | 1x Computer (for running server) |                                                                                                                                                                               |
+| 1x Wi-fi Router (for connecting the different devices) |                                                                                                                                                                               |
+
+
 I've decided to work with the TMP36 sensors and RPI picos Mainly for their low price. Technically I could have gone even cheaper, but I plan on reusing the Picos for different projects when it's a bit less warm, since they are very versatile.
+
 All components have been bought from malnapc.hu. I paid 9500 HUF (273 SEK) for the required components (besides the PC) and had a lot of cables left over.
 
 ## Objective
@@ -48,7 +52,10 @@ To flash an RPI Pico W:
 
 ## Circuitry
 We will be assembling two circuits, one for each Pico, but both circuits are exactly the same, so I'll describe it only once
-
+1. Connect the 3.3v in(left) pin of the TMP36 to the 3.3v out pin of the Pico
+2. Connect the Analog0 pin of the pico to the analog out(middle) pin of the TMP36
+3. Connect the ground pin of the TMP36 to one of the grounds on the Pico 
+![Raspberry-Pi-Pico-Pinout](https://github.com/gyurka66/IoT-Temperature-Control/assets/32873322/f0b26dbb-3a08-4595-b2fd-3c4266a771a3)
 The TMP36 chip has a nominal power draw of 50 microamperes on 3.3V, this is pretty much negligible. The Pico itself draws about 65mA according to Multimeter.
 
 ## Platform
@@ -63,8 +70,11 @@ The sensors send their data every 10 seconds, this is pretty easy to change in t
 I'm using just UDP because the only thing I'm sending is a number that generally takes only 2 bytes to store, so there is no need for anything more complicated. Also it's no big deal if one transmission gets lost, due to the non-checking nature of UDP, since this is not a time or correctness critical application. As for using HTTP for the communication with the app, I'm using it because the Flutter http package is very easy to use.
 
 ## Presentation
-From the user side, the application will look   like this:
-image here
+From the user side, the application will look like this:
+![mainpage](https://github.com/gyurka66/IoT-Temperature-Control/assets/32873322/ae17b8af-2d8b-464a-b11c-1eb90154478b)
+And here is the notifications that that the app sends:
+![notification](https://github.com/gyurka66/IoT-Temperature-Control/assets/32873322/a3052a72-7b50-45eb-8588-aefd6f7de7b5)
+
 
 The data here gets updated every minute, a notification is sent if the outside temperature rises above the inside or the other way around.
 
@@ -152,4 +162,6 @@ Future<void> temperatureListener(SendPort sendPort) async {
 
 # Final Overview
 I thought the project went well, I've tried to keep everything minimalistic and clean as possible.
-Some pics of the finished project here:
+A pic of the finished project:
+![pico_in_operation](https://github.com/gyurka66/IoT-Temperature-Control/assets/32873322/4e1a177f-e391-4623-8778-56bb0b1bd324)
+
