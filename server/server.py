@@ -29,7 +29,6 @@ def inside_thread_controller(socket: socket.socket):
     global g_inside_temperature
     while True:
         temp = listenForTemp(socket)
-        print("received inside temp:", temp)
         g_inside_temperature = temp
 
 def http_thread_controller(socket: HTTPServer):
